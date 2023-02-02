@@ -85,7 +85,7 @@ class OrderBook {
                 cout << copy.top().price << "\t" << copy.top().volume << "\t" << copy.top().id << "\t" << copy.top().name << endl;
                 copy.pop();
             }
-
+            cout << "asdasd" << endl;
             copy = sells;
 
             while (!copy.empty()) {
