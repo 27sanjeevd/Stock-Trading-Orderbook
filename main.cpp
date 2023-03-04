@@ -5,7 +5,7 @@
 using namespace std;
 
 struct Order {
-    int quantity;
+    float quantity;
     double price;
     bool side;
     int id;
@@ -26,12 +26,17 @@ struct SellOrderComparator {
 class Orderbook {
     public:
 
-        void addOrder(Order order) {
-            if (order.side == true){
-                order.id = buy_order += 2;
+        void addOrder(Order order, int id = -1) {
+            if (id != -1){
+                order.id = id;
             }
             else {
-                order.id = sell_order += 2;
+                if (order.side == true){
+                    order.id = buy_order += 2;
+                }
+                else {
+                    order.id = sell_order += 2;
+                }
             }
 
             if (order.side == true){
@@ -138,14 +143,14 @@ class Orderbook {
                         buy.quantity -= sell_amt;
                         buys.pop();
                         sells.pop();
-                        addOrder(buy);
+                        addOrder(buy, buy.id);
                         cout << buy.id << " and " << sell.id << " matched at amount " << sell_amt << endl;
                     }
                     else {
                         sell.quantity -= buy_amt;
                         buys.pop();
                         sells.pop();
-                        addOrder(sell);
+                        addOrder(sell, sell.id);
                         cout << buy.id << " and " << sell.id << " matched at amount " << buy_amt << endl;
                     }
                 }
@@ -163,10 +168,10 @@ class Orderbook {
 int main() {
     Orderbook book1;
     book1.addOrder({15, 105.5, true});
-    book1.addOrder({12, 122.5, true});
-    book1.addOrder({115, 96, true});
-    book1.addOrder({17, 105.5, false});
-    book1.addOrder({19, 95, false});
+    book1.addOrder({80, 111.5, true});
+    book1.addOrder({15, 108, true});
+    book1.addOrder({17, 109.5, false});
+    book1.addOrder({20, 110.4, false});
     book1.printOrders();
     book1.removeOrder(2);
     cout << endl;

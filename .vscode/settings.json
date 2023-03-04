@@ -9,6 +9,8 @@
         "map": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "iostream": "cpp",
+        "__mutex_base": "cpp"
     }
 }
