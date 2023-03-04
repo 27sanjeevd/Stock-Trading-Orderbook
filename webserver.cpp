@@ -9,8 +9,7 @@
 
 #define PORT 80
 
-int main() {
-
+int createServer() { 
     // SERVER
     struct sockaddr_in saddr = {
         .sin_family = AF_INET,
@@ -83,6 +82,11 @@ int main() {
         close(socketClient);
     }
 
+    return 0;
+}
+
+int main() {
+    createServer();
 
 
     return 0;
