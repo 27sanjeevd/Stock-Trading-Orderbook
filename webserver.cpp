@@ -7,7 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define PORT 5000
+#define PORT 80
 
 int main() {
 
@@ -23,7 +23,7 @@ int main() {
     setsockopt(socketServer, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &option, sizeof(option));
 
     if (socketServer == -1){
-        std::cout << "Not able to create our socket" << std::endl;
+        std::cerr << "Not able to create our socket" << std::endl;
         return -1;
     }
 
@@ -58,6 +58,29 @@ int main() {
         char portClient[NI_MAXSERV];
         memset(hostClient, 0, NI_MAXHOST);
         memset(portClient, 0, NI_MAXSERV);
+        if (getnameinfo((sockaddr*)&caddr, sizeof(caddr), hostClient, NI_MAXHOST, portClient, NI_MAXSERV, 0) == 0){
+            std::cout << "--> " << hostClient << " connected to the port " << portClient << std::endl;
+        }
+        else {
+            inet_ntop(AF_INET, &caddr.sin_addr, hostClient, NI_MAXHOST);
+            std::cout << "--> " << hostClient << " connected to the port " << ntohs(caddr.sin_port) << std::endl;
+        }
+
+        //Receive data
+        sizeInBytesOfReceivedData = recv(socketClient, buff, 4096, 0);
+        if (sizeInBytesOfReceivedData == -1){
+            std::cerr << "Error receiving message. Quitting";
+            break;
+        }
+        else if (sizeInBytesOfReceivedData == 0){
+            std::cout << "Client Disconnected" << std::endl;
+            break;
+        }
+        send(socketClient, buff, sizeInBytesOfReceivedData + 1, 0);
+
+        std::cout << std::string(buff, 0, sizeInBytesOfReceivedData) << std::endl;
+
+        close(socketClient);
     }
 
 
