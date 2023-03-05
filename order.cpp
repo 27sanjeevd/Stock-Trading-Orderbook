@@ -100,11 +100,74 @@ class Orderbook {
                     std::cout << "Client Disconnected" << std::endl;
                     break;
                 }
-                send(socketClient, buff, sizeInBytesOfReceivedData + 1, 0);
+                std::string s = std::string(buff, 0, sizeInBytesOfReceivedData);
 
-                std::cout << std::string(buff, 0, sizeInBytesOfReceivedData) << std::endl;
+                std::istringstream iss(s);
+                std::vector<std::string> words;
+                std::string word;
+                while (std::getline(iss, word, ' ')) {
+                    words.push_back(word);
+                }
 
+                if (words[0] == "add" && words.size() >= 4) {
+                    float quantity = std::stof(words[1]);
+                    double price = std::stod(words[2]);
+                    bool side;
+                    if (words[3] == "true"){
+                        side = true;
+                    }
+                    else {
+                        side = false;
+                    }
+                    addOrder({quantity, price, side});
+
+
+                    std::string string5 = "order successfully added";
+                    const char* messageData1 = string5.c_str();
+                    size_t messageSize = sizeof(string5);
+                    send(socketClient, messageData1, messageSize, 0);
+
+                }
+                else if (words[0] == "print"){
+                    printOrders(socketClient);
+
+                    std::string string5 = "order successfully printed";
+                    const char* messageData1 = string5.c_str();
+                    size_t messageSize = sizeof(string5);
+                    send(socketClient, messageData1, messageSize, 0);
+                }
+                else if (words[0] == "remove" && words.size() >= 2){
+                    int id = std::stoi(words[1]);
+                    removeOrder(id);
+                    
+
+                    std::string string5 = "order successfully removed";
+                    const char* messageData1 = string5.c_str();
+                    size_t messageSize = sizeof(string5);
+                    send(socketClient, messageData1, messageSize, 0);
+
+                }
+                else if (words[0] == "match"){
+                    matchOrders();
+                }
+
+                /*
+                std::cout << words[0] << std::endl;
+                for (const auto& w : words) {
+                    std::cout << w << std::endl;
+                }
+                std::cout << s << std::endl;
+                
+                std::cout << s.c_str() << std::endl;
+                const char* temp = s.c_str();
+                std::string string5 = "hello guys, your order";
+                const char* messageData1 = string5.c_str();
+                size_t messageSize = sizeof(string5);
+                send(socketClient, messageData1, messageSize, 0);
+                send(socketClient, buff, sizeInBytesOfReceivedData, 0);
+                */
                 close(socketClient);
+
             }
 
             return 0;
@@ -194,20 +257,30 @@ class Orderbook {
             }
         }
 
-        void printOrders(){
+        void printOrders(int socketClient){
             std::priority_queue<Order, std::vector<Order>, BuyOrderComparator> copyBuys = buys;
             std::priority_queue<Order, std::vector<Order>, SellOrderComparator> copySells = sells;
 
             while (!copyBuys.empty()){
                 Order order = copyBuys.top();
                 copyBuys.pop();
-                std::cout << "Buy ->\tAmount: " << order.quantity << "\tPrice: " << order.price << "\tID: " << order.id << std::endl;
+                std::string s = "Buy ->\tAmount: " + std::to_string(order.quantity) + "\tPrice: " + std::to_string(order.price) + "\tID: " + std::to_string(order.id) + "\n";
+                const char* messageData1 = s.c_str();
+                size_t messageSize = s.length();
+                send(socketClient, messageData1, messageSize, 0);
+                std::cout << messageData1;
+                //std::cout << "Buy ->\tAmount: " << order.quantity << "\tPrice: " << order.price << "\tID: " << order.id << std::endl;
             }
 
             while (!copySells.empty()){
                 Order order = copySells.top();
                 copySells.pop();
-                std::cout << "Sell ->\tAmount: " << order.quantity << "\tPrice: " << order.price << "\tID: " << order.id << std::endl;
+                std::string s = "Sell ->\tAmount: " + std::to_string(order.quantity) + "\tPrice: " + std::to_string(order.price) + "\tID: " + std::to_string(order.id) + "\n";
+                const char* messageData1 = s.c_str();
+                size_t messageSize = s.length();
+                send(socketClient, messageData1, messageSize, 0);
+                std::cout << messageData1;
+                //std::cout << "Sell ->\tAmount: " << order.quantity << "\tPrice: " << order.price << "\tID: " << order.id << std::endl;
             }
         }
 
