@@ -1,6 +1,15 @@
 #include <iostream>
 #include <queue>
 #include <functional>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sstream>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <string.h>
+#include <unistd.h>
+
+#define PORT 80
 
 using namespace std;
 
@@ -22,6 +31,8 @@ struct SellOrderComparator {
         return a.price > b.price;
     }
 };
+
+
 
 class Orderbook {
     public:

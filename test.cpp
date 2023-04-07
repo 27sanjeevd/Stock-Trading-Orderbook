@@ -33,5 +33,6 @@ int main() {
 
     cv.notify_all();
     t1.join();
+    for (int x = 0; x < 10; x++)
     return 0;
 }

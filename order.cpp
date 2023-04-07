@@ -124,7 +124,7 @@ class Orderbook {
 
                     std::string string5 = "order successfully added";
                     const char* messageData1 = string5.c_str();
-                    size_t messageSize = sizeof(string5);
+                    size_t messageSize = string5.length();
                     send(socketClient, messageData1, messageSize, 0);
 
                 }
@@ -133,7 +133,7 @@ class Orderbook {
 
                     std::string string5 = "order successfully printed";
                     const char* messageData1 = string5.c_str();
-                    size_t messageSize = sizeof(string5);
+                    size_t messageSize = string5.length();
                     send(socketClient, messageData1, messageSize, 0);
                 }
                 else if (words[0] == "remove" && words.size() >= 2){
@@ -143,12 +143,12 @@ class Orderbook {
 
                     std::string string5 = "order successfully removed";
                     const char* messageData1 = string5.c_str();
-                    size_t messageSize = sizeof(string5);
+                    size_t messageSize = string5.length();
                     send(socketClient, messageData1, messageSize, 0);
 
                 }
                 else if (words[0] == "match"){
-                    matchOrders();
+                    matchOrders(socketClient);
                 }
 
                 /*
@@ -284,8 +284,13 @@ class Orderbook {
             }
         }
 
-        void matchOrders() {
+        void matchOrders(int socketClient) {
             bool continue1 = true;
+
+            if (buys.size() == 0 || sells.size() == 0){
+                continue1 = false;
+            }
+            
             while (continue1) {
                 Order buy = buys.top();
                 Order sell = sells.top();
@@ -295,21 +300,41 @@ class Orderbook {
                 else {
                     int buy_amt = buy.quantity;
                     int sell_amt = sell.quantity;
+                    
+                    std::string s = std::to_string(buy.id) + " and " + std::to_string(sell.id) + " matched at amount ";
 
                     if (buy_amt > sell_amt){
                         buy.quantity -= sell_amt;
                         buys.pop();
                         sells.pop();
                         addOrder(buy, buy.id);
-                        std::cout << buy.id << " and " << sell.id << " matched at amount " << sell_amt << std::endl;
+                        s += std::to_string(sell_amt) + "\n";
+                        //std::cout << buy.id << " and " << sell.id << " matched at amount " << sell_amt << std::endl;
                     }
-                    else {
+                    else if (buy_amt < sell_amt) {
                         sell.quantity -= buy_amt;
                         buys.pop();
                         sells.pop();
                         addOrder(sell, sell.id);
-                        std::cout << buy.id << " and " << sell.id << " matched at amount " << buy_amt << std::endl;
+                        s += std::to_string(buy_amt) + "\n";
+                        //std::cout << buy.id << " and " << sell.id << " matched at amount " << buy_amt << std::endl;
                     }
+                    else {
+                        buys.pop();
+                        sells.pop();
+                        //std::cout << buy.id << " and " << sell.id << " matched at amount " << buy_amt << std::endl;
+                    }
+                    //printOrders(socketClient);
+
+                    if (buys.size() == 0 || sells.size() == 0){
+                        continue1 = false;
+                    }
+                    
+                    const char* messageData1 = s.c_str();
+                    size_t messageSize = s.length();
+                    send(socketClient, messageData1, messageSize, 0);
+                    std::cout << messageData1;
+                    
                 }
             }
         }
@@ -326,19 +351,5 @@ int main() {
     Orderbook book1;
     int output = book1.createServer();
 
-    /*
-    book1.addOrder({15, 105.5, true});
-    book1.addOrder({80, 111.5, true});
-    book1.addOrder({15, 108, true});
-    book1.addOrder({17, 109.5, false});
-    book1.addOrder({20, 110.4, false});
-    book1.printOrders();
-    book1.removeOrder(2);
-    cout << endl;
-    book1.printOrders();
-    book1.matchOrders();
-    book1.printOrders();
-    */
     return output;
-
 }
