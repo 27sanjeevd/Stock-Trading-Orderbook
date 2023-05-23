@@ -31,12 +31,23 @@ char* user_input() {
 	}
 }
 
+char* view_account_actions() {
+	const int MAX_RESULT_LENGTH = 300;
+    char* result = new char[MAX_RESULT_LENGTH];
+
+    return NULL;
+}
+
 char* user_main_actions() {
 	const int MAX_RESULT_LENGTH = 300;
     char* result = new char[MAX_RESULT_LENGTH];
 
-    std::cout << "(BUY) or (SELL) a stock? or (LOGOUT): ";
+    std::cout << "(BUY) or (SELL) a stock? or (LOGOUT) or (VIEW): ";
     char* action = user_input();
+
+    if (strcmp(action, "VIEW") == 0) {
+    	return action;
+    }
 
     if (strcmp(action, "LOGOUT") != 0) {
 	    std::cout << "Which stock? ";
@@ -45,10 +56,14 @@ char* user_main_actions() {
 	    std::cout << "How much? ";
 	    char* amount = user_input();
 
-	    std::snprintf(result, MAX_RESULT_LENGTH, "%s %s %s", action, stock, amount);
+	    std::cout << "What price? ";
+	    char* price = user_input();
+
+	    std::snprintf(result, MAX_RESULT_LENGTH, "%s %s %s %s", action, stock, amount, price);
 	    free(action);
 	    free(stock);
 	    free(amount);
+	    free(price);
 
 	    return result;
 	}

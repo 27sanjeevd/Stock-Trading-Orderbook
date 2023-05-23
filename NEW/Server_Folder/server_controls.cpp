@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "server_controls.h"
+#include "orderbook.h"
 
 #define PRICE 1 
 
@@ -71,7 +72,47 @@ void remove_node(User* curr, char* stock_name) {
 	}
 }
 
-void buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
+Stock* create_stock_order(User* curr, char* stock_name, int buy_or_sell, int amt, int price) {
+	Stock* temp = NULL;
+
+	if (curr != NULL && stock_name != NULL && (buy_or_sell == 0 || buy_or_sell == 1) 
+		&& amt >= 0 && price > 0) {
+		temp = (Stock*) malloc(sizeof(Stock));
+		if (temp != NULL) {
+			temp->name = (char*) malloc(strlen(stock_name) + 1);
+			strcpy(temp->name, stock_name);
+			temp->id = (char*) malloc(strlen(curr->id) + 1);
+			strcpy(temp->id, curr->id);
+
+			temp->amt = amt;
+			temp->price = price;
+			temp->isBuy = buy_or_sell;
+			temp->next = NULL;
+
+		}
+	}
+
+	return temp;
+}
+
+void add_stock_order(User* curr, Stock* new_order) {
+	if (curr != NULL && new_order != NULL) {
+		if (curr->stocklist == NULL) {
+			curr->stocklist = new_order;
+		}
+		else {
+			Stock* temp = curr->stocklist;
+			while (temp->next != NULL) {
+				temp = temp->next;
+			}
+			temp->next = new_order;
+		}
+
+		curr->num_stocks++;
+	}
+}
+
+Stock* buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 	Stock* temp;
 	Stock* loop;
 	bool continue1 = true;
@@ -84,7 +125,11 @@ void buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 			if (temp != NULL) {
 				temp->name = (char*) malloc(strlen(stock_name) + 1);
 				strcpy(temp->name, stock_name);
+				temp->id = (char*) malloc(strlen(curr->id) + 1);
+				strcpy(temp->id, curr->id);
+
 				temp->amt = stock_amt;
+				temp->price = 150;
 				temp->next = NULL;
 				curr->stocklist = temp;
 				curr->num_stocks++;
@@ -136,7 +181,11 @@ void buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 				if (temp != NULL) {
 					temp->name = (char*) malloc(strlen(stock_name) + 1);
 					strcpy(temp->name, stock_name);
+					temp->id = (char*) malloc(strlen(curr->id) + 1);
+					strcpy(temp->id, curr->id);
+
 					temp->amt = stock_amt;
+					temp->price = 150;
 					temp->next = NULL;
 					loop->next = temp;
 					curr->num_stocks++;
@@ -146,24 +195,65 @@ void buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 		}
 
 	}
+
+	return temp;
 }
 
-int parse_command(User* curr, char* input) {
-	char str1[20], str2[20], str3[20];
+int parse_command(User* curr, char* input, OrderBook* temp_book) {
+	char str1[20], str2[20], str3[20], str4[20];
     
-    int count = sscanf(input, "%s %s %s", str1, str2, str3);
-    if (strcmp(str1, "BUY") == 0) {
-    	buy_stock(curr, 0, str2, atoi(str3));
-    }
-    else if (strcmp(str1, "SELL") == 0) {
-    	buy_stock(curr, 1, str2, atoi(str3));
-    }
-    else if (strcmp(str1, "LOGOUT") == 0) {
+    int count = sscanf(input, "%s %s %s %s", str1, str2, str3, str4);
+
+    if (strcmp(str1, "LOGOUT") == 0) {
     	return 1;
+    }
+    else if (strcmp(str1, "VIEW") == 0) {
+    	return 2;
+    }
+    else {
+
+	    if (strcmp(str1, "BUY") == 0) {
+	    	Stock* new1 = create_stock_order(curr, str2, 0, atoi(str3), atoi(str4));
+	    	add_stock_order(curr, new1);
+
+	    	Orders* new_order = create_order(new1);
+	    	add_order(temp_book, new_order);
+	    	/*
+	    	Stock* new1 = buy_stock(curr, 0, str2, atoi(str3));
+	    	add_order(temp_book, create_order(curr->id, str2, atoi(str3), 100, true));
+	    	*/
+
+	    }
+	    else if (strcmp(str1, "SELL") == 0) {
+	    	Stock* new1 = create_stock_order(curr, str2, 1, atoi(str3), atoi(str4));
+	    	add_stock_order(curr, new1);
+
+	    	
+
+
+	    	/*
+	    	Stock* new1 = buy_stock(curr, 1, str2, atoi(str3));
+	    	add_order(temp_book, create_order(curr->id, str2, atoi(str3), 100, false));
+	    	*/
+	    }
     }
 
     return 0;
 }
 
+char* return_position(Stock* curr) {
+	int bufferSize = 100;
+	char* buffer = (char*) malloc(sizeof(char) * bufferSize);
+
+	if (curr == NULL) {
+		strcpy(buffer, "Invalid Stock");
+		return buffer;
+	}
+
+	snprintf(buffer, bufferSize, "\nName: %s\tAmount: %d\tPrice: %d\tIs Buy: %s",
+             curr->name, curr->amt, curr->price, (curr->isBuy ? "true" : "false"));
+
+    return buffer;
+}
 
 

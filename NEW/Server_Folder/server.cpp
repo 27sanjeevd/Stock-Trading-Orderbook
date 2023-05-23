@@ -102,10 +102,36 @@ int main(int argc, char const *argv[]) {
 	        	output = (char*) malloc(strlen(buffer) + 1);
 	        	strcpy(output, buffer);
 	        	printf("%s\n", output);
-	        	logout = parse_command(temp, output);
+	        	logout = parse_command(temp, output, server_book);
 	        	if (logout == 1) {
 	        		log_user = false;
 	        	}
+                else if (logout == 2) {
+                    /*
+                        This is the VIEW section, allowing the user to be able to view
+                        what stocks they've purchased. Work on this to fix the printing.
+
+                    */
+                    int bufferIndex = 0;
+                    const char newline = '\n';
+
+                    Stock* looper = temp->stocklist;
+                    output[0] = '\0';
+
+                    while (looper != NULL) {
+                        printf("%s\n", looper->name);
+                        char* result = return_position(looper);
+    
+                        strncat(output, result, 1000 - strlen(output) - 1);
+
+                        free(result);
+                        /*
+                        code to add the return of the function into the buffer "output"
+                        */
+                        looper = looper->next;
+                    }
+                    strcat(output, "\0");
+                }
 	        	printf("%d\n", temp->num_stocks);
 	        }
 
