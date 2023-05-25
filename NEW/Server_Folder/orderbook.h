@@ -34,4 +34,7 @@ void add_order(OrderBook* curr_book, Orders* new1);
 bool compare_order(Orders* old_order, Orders* new_order);
 void edit_order(OrderBook* curr_book, Orders* order1, int new_amt);
 void remove_order(OrderBook* curr_book, Orders* order1);
+
+void print_orderbook(OrderBook* curr_book);
+void order_matching(Stock_Exchange* curr_exchange);
 #endif

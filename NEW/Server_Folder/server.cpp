@@ -132,6 +132,16 @@ int main(int argc, char const *argv[]) {
                     }
                     strcat(output, "\0");
                 }
+                else if (logout == 4) {
+                    /*
+                        This is the view balance section, where the user will be
+                        able to see how much money they have.
+
+                        TODO: Create a string buffer with "balance: XX", and copy that
+                        into output, so that it gets sent to the user
+                    */
+                    printf("Balance: %d\n", temp->bal);
+                }
 	        	printf("%d\n", temp->num_stocks);
 	        }
 

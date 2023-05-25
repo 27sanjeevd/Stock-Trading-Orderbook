@@ -1,7 +1,7 @@
 #include <iostream>
 #include "client_controls.h"
 
-#define LSH_INPUT_SIZE 10;
+#define LSH_INPUT_SIZE 15;
 char* user_input() {
 	int pos = 0;
 	int input_size = LSH_INPUT_SIZE;
@@ -48,8 +48,13 @@ char* user_main_actions() {
     if (strcmp(action, "VIEW") == 0) {
     	return action;
     }
-
-    if (strcmp(action, "LOGOUT") != 0) {
+    else if (strcmp(action, "VIEW_ORDERS") == 0) {
+    	return action;
+    }
+    else if (strcmp(action, "BALANCE") == 0) {
+    	return action;
+    }
+    else if (strcmp(action, "LOGOUT") != 0) {
 	    std::cout << "Which stock? ";
 	    char* stock = user_input();
 

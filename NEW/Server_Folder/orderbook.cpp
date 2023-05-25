@@ -20,6 +20,7 @@ Stock_Exchange* create_exchange(OrderBook* curr, char* stock_name) {
 		new1 = (Stock_Exchange*) malloc(sizeof(Stock_Exchange));
 		if (new1 != NULL) {
 			new1->name = (char*) malloc(strlen(stock_name) + 1);
+			strcpy(new1->name, stock_name);
 			new1->buy_orders = NULL;
 			new1->sell_orders = NULL;
 			new1->next = NULL;
@@ -28,7 +29,6 @@ Stock_Exchange* create_exchange(OrderBook* curr, char* stock_name) {
 
 			if (curr->stock_books == NULL) {
 				curr->stock_books = new1;
-
 				return curr->stock_books;
 			}
 			else {
@@ -241,6 +241,36 @@ void remove_order(OrderBook* curr_book, Orders* order1) {
 			}
 		}
 
+	}
+}
+
+void print_orderbook(OrderBook* curr_book) {
+	Stock_Exchange* looper = curr_book->stock_books;
+	while (looper != NULL) {
+		printf("Orders for %s\n", looper->name);
+		printf("Buy Orders: \n");
+		Orders* temp = looper->buy_orders;
+
+		while (temp != NULL) {
+			Stock* temp_stock = temp->stock_info;
+
+			printf("id: %s\t amt: %d\t price %d\n", 
+				temp_stock->id, temp_stock->amt, temp_stock->price);
+			temp = temp->next;
+		}
+
+		printf("Sell Orders: \n");
+		temp = looper->sell_orders;
+
+		while (temp != NULL) {
+			Stock* temp_stock = temp->stock_info;
+
+			printf("id: %s\t amt: %d\t price %d\n", 
+				temp_stock->id, temp_stock->amt, temp_stock->price);
+			temp = temp->next;
+		}
+
+		looper = looper->next;
 	}
 }
 

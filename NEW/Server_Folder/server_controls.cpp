@@ -210,10 +210,17 @@ int parse_command(User* curr, char* input, OrderBook* temp_book) {
     else if (strcmp(str1, "VIEW") == 0) {
     	return 2;
     }
+    else if (strcmp(str1, "VIEW_ORDERS") == 0) {
+    	print_orderbook(temp_book);
+    	return 3;
+    }
+    else if (strcmp(str1, "BALANCE") == 0) {
+    	return 4;
+    }
     else {
 
 	    if (strcmp(str1, "BUY") == 0) {
-	    	Stock* new1 = create_stock_order(curr, str2, 0, atoi(str3), atoi(str4));
+	    	Stock* new1 = create_stock_order(curr, str2, 1, atoi(str3), atoi(str4));
 	    	add_stock_order(curr, new1);
 
 	    	Orders* new_order = create_order(new1);
@@ -225,11 +232,11 @@ int parse_command(User* curr, char* input, OrderBook* temp_book) {
 
 	    }
 	    else if (strcmp(str1, "SELL") == 0) {
-	    	Stock* new1 = create_stock_order(curr, str2, 1, atoi(str3), atoi(str4));
+	    	Stock* new1 = create_stock_order(curr, str2, 0, atoi(str3), atoi(str4));
 	    	add_stock_order(curr, new1);
 
-	    	
-
+	    	Orders* new_order = create_order(new1);
+	    	add_order(temp_book, new_order);
 
 	    	/*
 	    	Stock* new1 = buy_stock(curr, 1, str2, atoi(str3));
