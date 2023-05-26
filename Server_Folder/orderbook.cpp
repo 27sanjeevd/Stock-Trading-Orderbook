@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "orderbook.h"
+#include "server_controls.h"
 
 OrderBook* create_orderbook() {
 	OrderBook* output = (OrderBook*) malloc(sizeof(OrderBook));
@@ -193,7 +194,7 @@ void edit_order(OrderBook* curr_book, Orders* order1, int new_amt) {
 }
 
 
-void remove_order(OrderBook* curr_book, Orders* order1) {
+void remove_order(OrderBook* curr_book, Orders* order1, User* curr_user) {
 	Stock_Exchange* curr_exchange;
 	if (curr_book != NULL && order1 != NULL) {
 		curr_exchange = exchange_exists(curr_book, order1->stock_info->name);
@@ -215,6 +216,10 @@ void remove_order(OrderBook* curr_book, Orders* order1) {
 							prev->next = loop_order->next;
 						}
 						continue1 = false;
+
+						remove_node(curr_user, loop_order->stock_info);
+						free(loop_order);
+
 					}
 					prev = loop_order;
 					loop_order = loop_order->next;
@@ -234,6 +239,9 @@ void remove_order(OrderBook* curr_book, Orders* order1) {
 							prev->next = loop_order->next;
 						}
 						continue1 = false;
+
+						remove_node(curr_user, loop_order->stock_info);
+						free(loop_order);
 					}
 					prev = loop_order;
 					loop_order = loop_order->next;
@@ -272,6 +280,26 @@ void print_orderbook(OrderBook* curr_book) {
 
 		looper = looper->next;
 	}
+}
+void determine_which_exchange_match(OrderBook* curr_book) {
+	Stock_Exchange* temp = OrderBook->stock_books;
+
+	while (temp != NULL) {
+		Orders* buy_list = temp->buy_orders;
+		Orders* sell_list = temp->sell_orders;
+		if (buy_list != NULL && sell_list != NULL) {
+			if (buy_list->stock_info->price >= sell_list->stock_info->price) {
+				order_matching(temp);
+			}
+		}
+
+		temp = temp->next;
+	}
+
+}
+void order_matching(Stock_Exchange* curr_exchange) {
+
+
 }
 
 

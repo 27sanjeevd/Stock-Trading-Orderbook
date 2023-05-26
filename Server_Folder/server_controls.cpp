@@ -47,14 +47,14 @@ User* create_user(int bal) {
 	return new1;
 }
 
-void remove_node(User* curr, char* stock_name) {
+void remove_node(User* curr, Stock* stock) {
 
-	if (curr != NULL && stock_name != NULL) {
+	if (curr != NULL && stock != NULL) {
 		Stock* temp = curr->stocklist;
 		Stock* prev = NULL;
 		bool continue1 = true;
 		while (temp != NULL && continue1) {
-			if (strcmp(temp->name, stock_name) == 0) {
+			if (temp == stock) {
 				if (prev == NULL) {
 					curr->stocklist = temp->next;
 				}
@@ -63,6 +63,10 @@ void remove_node(User* curr, char* stock_name) {
 				}
 				continue1 = false;
 				curr->num_stocks--;
+
+				free(temp->name);
+				free(temp->id);
+				free(temp);
 			}
 
 			prev = temp;
@@ -112,6 +116,7 @@ void add_stock_order(User* curr, Stock* new_order) {
 	}
 }
 
+/*
 Stock* buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 	Stock* temp;
 	Stock* loop;
@@ -198,6 +203,7 @@ Stock* buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 
 	return temp;
 }
+*/
 
 int parse_command(User* curr, char* input, OrderBook* temp_book) {
 	char str1[20], str2[20], str3[20], str4[20];
