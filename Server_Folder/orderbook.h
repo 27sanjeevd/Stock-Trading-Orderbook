@@ -4,6 +4,7 @@
 #include "server_controls.h"
 
 typedef struct Stock Stock;
+typedef struct User User;
 
 typedef struct Orders {
 	Stock* stock_info;
@@ -33,8 +34,9 @@ Orders* create_order(Stock* info);
 void add_order(OrderBook* curr_book, Orders* new1);
 bool compare_order(Orders* old_order, Orders* new_order);
 void edit_order(OrderBook* curr_book, Orders* order1, int new_amt);
-void remove_order(OrderBook* curr_book, Orders* order1);
+void remove_order(OrderBook* curr_book, Orders* order1, User* curr_user);
 
 void print_orderbook(OrderBook* curr_book);
-void order_matching(Stock_Exchange* curr_exchange);
+void determine_which_exchange_match(User** userlist, OrderBook* curr_book);
+void order_matching(User** userlist, OrderBook* curr_book, Stock_Exchange* curr_exchange);
 #endif

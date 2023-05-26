@@ -22,13 +22,14 @@ typedef struct User {
 } User;
 
 User* find_user(User** user_list, int num_users, char* id);
+User* find_user(User** user_list, char* id);
 char* generate_id();
 User* create_user(int bal);
 void remove_node(User* curr, Stock* stock);
 Stock* create_stock_order(User* curr, char* stock_name, int buy_or_sell, int amt, int price);
 void add_stock_order(User* curr, Stock* new_order);
 Stock* buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt);
-int parse_command(User* curr, char* input, OrderBook* curr_book);
+int parse_command(User** user_list, User* curr, char* input, OrderBook* curr_book);
 char* return_position(Stock* curr);
 
 #endif

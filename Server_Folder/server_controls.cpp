@@ -16,6 +16,16 @@ User* find_user(User** user_list, int num_users, char* id) {
 
 	return NULL;
 }
+User* find_user(User** user_list, char* id) {
+	int index = 0;
+	while (user_list[index] != NULL) {
+		if (strcmp(user_list[index]->id, id) == 0) {
+			return user_list[index];
+		}
+	}
+
+	return NULL;
+}
 
 char* generate_id() {
     const int length = 4;
@@ -205,10 +215,12 @@ Stock* buy_stock(User* curr, int buy_or_sell, char* stock_name, int stock_amt) {
 }
 */
 
-int parse_command(User* curr, char* input, OrderBook* temp_book) {
+int parse_command(User** user_list, User* curr, char* input, OrderBook* temp_book) {
 	char str1[20], str2[20], str3[20], str4[20];
     
     int count = sscanf(input, "%s %s %s %s", str1, str2, str3, str4);
+
+    determine_which_exchange_match(user_list, temp_book);
 
     if (strcmp(str1, "LOGOUT") == 0) {
     	return 1;

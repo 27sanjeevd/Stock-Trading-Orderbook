@@ -281,15 +281,15 @@ void print_orderbook(OrderBook* curr_book) {
 		looper = looper->next;
 	}
 }
-void determine_which_exchange_match(OrderBook* curr_book) {
-	Stock_Exchange* temp = OrderBook->stock_books;
+void determine_which_exchange_match(User** userlist, OrderBook* curr_book) {
+	Stock_Exchange* temp = curr_book->stock_books;
 
 	while (temp != NULL) {
 		Orders* buy_list = temp->buy_orders;
 		Orders* sell_list = temp->sell_orders;
 		if (buy_list != NULL && sell_list != NULL) {
 			if (buy_list->stock_info->price >= sell_list->stock_info->price) {
-				order_matching(temp);
+				order_matching(userlist, curr_book, temp);
 			}
 		}
 
@@ -297,8 +297,61 @@ void determine_which_exchange_match(OrderBook* curr_book) {
 	}
 
 }
-void order_matching(Stock_Exchange* curr_exchange) {
+void order_matching(User** userlist, OrderBook* curr_book, Stock_Exchange* curr_exchange) {
+	while (curr_exchange->buy_orders != NULL &&
+		curr_exchange->sell_orders != NULL &&
+		curr_exchange->buy_orders->stock_info->price >= 
+		curr_exchange->sell_orders->stock_info->price) {
 
+		Stock* buy_order = curr_exchange->buy_orders->stock_info;
+		Stock* sell_order = curr_exchange->sell_orders->stock_info;
+
+		int price = (buy_order->price + sell_order->price)/2;
+		if (buy_order->amt > sell_order->amt) {
+
+			User* buyer = find_user(userlist, buy_order->id);
+			User* seller = find_user(userlist, sell_order->id);
+			
+			buy_order->amt -= sell_order->amt;
+			buyer->bal -= price * sell_order->amt;
+			seller->bal += price * sell_order->amt;
+
+			Orders* freed_order = curr_exchange->sell_orders;
+			curr_exchange->sell_orders = curr_exchange->sell_orders->next;
+
+			remove_order(curr_book, freed_order, seller);
+		}
+		else if (buy_order->amt < sell_order->amt) {
+
+			User* buyer = find_user(userlist, buy_order->id);
+			User* seller = find_user(userlist, sell_order->id);
+
+			sell_order->amt -= buy_order->amt;
+			seller->bal -= price * buy_order->amt;
+			buyer->bal += price * buy_order->amt;
+
+			Orders* freed_order = curr_exchange->buy_orders;
+			curr_exchange->buy_orders = curr_exchange->buy_orders->next;
+
+			remove_order(curr_book, freed_order, buyer);
+		}
+		else {
+			User* buyer = find_user(userlist, buy_order->id);
+			User* seller = find_user(userlist, sell_order->id);
+
+			seller->bal -= price * buy_order->amt;
+			buyer->bal += price * buy_order->amt;
+
+			Orders* freed_buy_order = curr_exchange->buy_orders;
+			curr_exchange->buy_orders = curr_exchange->buy_orders->next;
+
+			Orders* freed_sell_order = curr_exchange->sell_orders;
+			curr_exchange->sell_orders = curr_exchange->sell_orders->next;
+
+			remove_order(curr_book, freed_buy_order, buyer);
+			remove_order(curr_book, freed_sell_order, seller);
+		}
+	}
 
 }
 

@@ -102,7 +102,7 @@ int main(int argc, char const *argv[]) {
 	        	output = (char*) malloc(strlen(buffer) + 1);
 	        	strcpy(output, buffer);
 	        	printf("%s\n", output);
-	        	logout = parse_command(temp, output, server_book);
+	        	logout = parse_command(users, temp, output, server_book);
 	        	if (logout == 1) {
 	        		log_user = false;
 	        	}
